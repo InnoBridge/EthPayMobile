@@ -1,8 +1,14 @@
 {
   "expo": {
     "name": "EthPay",
-    "slug": "EthPay",
+    "slug": "ethpay-mobile-app",
     "version": "1.0.0",
+    "sdkVersion": "51.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -22,6 +28,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "23cc5a22-e015-4b2f-9b35-8c7648a7808d"
+      }
+    },
+    "owner": "alofyahweh"
   }
 }
