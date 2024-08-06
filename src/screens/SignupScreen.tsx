@@ -4,15 +4,16 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../Navigation';
 import { Ionicons } from '@expo/vector-icons';
 
-type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
+type SignupScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Signup'>;
 
 type Props = {
-  navigation: LoginScreenNavigationProp;
+  navigation: SignupScreenNavigationProp;
 };
 
-const LoginScreen: React.FC<Props> = ({ navigation }) => {
+const SignupScreen: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -49,17 +50,22 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
               <Ionicons name={showPassword ? "eye-off" : "eye"} size={24} color="#A0A0A0" />
             </TouchableOpacity>
           </View>
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm Password"
+            placeholderTextColor="#A0A0A0"
+            secureTextEntry={!showPassword}
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+          />
           <TouchableOpacity
-            style={styles.loginButton}
+            style={styles.signupButton}
             onPress={() => navigation.navigate('Home')}
           >
-            <Text style={styles.loginButtonText}>Login</Text>
+            <Text style={styles.signupButtonText}>Sign Up</Text>
           </TouchableOpacity>
-          <TouchableOpacity>
-            <Text style={styles.forgotPassword}>Forgot your password?</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-            <Text style={styles.createAccount}>Create Account</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.loginLink}>Already have an account? <Text style={styles.loginLinkText}>Login</Text></Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -124,27 +130,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: 40,
   },
-  loginButton: {
+  signupButton: {
     backgroundColor: '#4169E1',
     borderRadius: 10,
     padding: 15,
     alignItems: 'center',
   },
-  loginButtonText: {
+  signupButtonText: {
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
   },
-  forgotPassword: {
+  loginLink: {
     color: '#FFFFFF',
     textAlign: 'center',
     marginTop: 15,
   },
-  createAccount: {
-    color: '#4169E1',
-    textAlign: 'center',
-    marginTop: 10,
-  },
+  loginLinkText: {
+      color: '#4169E1',
+    },
 });
 
-export default LoginScreen;
+export default SignupScreen;
