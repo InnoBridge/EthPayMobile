@@ -5,6 +5,7 @@ import HomeScreen from './screens/HomeScreen'
 import LoginScreen from './screens/LoginScreen';
 import SignupScreen from './screens/SignupScreen';
 import RecentTransactionsScreen from './screens/RecentTransactionsScreen';
+import FriendScreen from './screens/FriendScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -23,6 +24,7 @@ const Navigation = () => {
         <Stack.Screen name='Home' component={HomeScreen}/>
         <Stack.Screen name='Signup' component={SignupScreen} />
         <Stack.Screen name='RecentTransactions' component={RecentTransactionsScreen} />
+        <Stack.Screen name='Friends' component={FriendScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

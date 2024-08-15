@@ -38,6 +38,10 @@ const HomeScreen = ({ navigation }) => {
             <Ionicons name="person-add-outline" size={24} color="#4B0082" style={styles.iconPadding} />
             <Text style={styles.optionText}>Add a friend</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Friends')}>
+            <Ionicons name="cash-outline" size={24} color="#4B0082" style={styles.iconPadding} />
+            <Text style={styles.optionText}>View Friends</Text>
+          </TouchableOpacity>
         </View>
       </View>
       <BottomAppBar navigation={navigation} />
