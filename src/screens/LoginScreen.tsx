@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, TextInput, ImageBackground, Image } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View, TouchableOpacity, TextInput, ImageBackground, Image } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../Navigation';
 import { Ionicons } from '@expo/vector-icons';
+import * as SecureStore from 'expo-secure-store';
+import axios from 'axios';
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
@@ -14,6 +16,40 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [loading, setLoading] = useState(false)
+
+  const handleLogin = async () => {
+
+    if (!email) {
+      setErrorMessage('Please enter your email');
+      return;
+    }
+    if (!password) {
+      setErrorMessage('Please enter your password');
+      return;
+    }
+
+    setLoading(true);
+    setErrorMessage('');
+
+    const loginData = {
+      email: email,
+      password: password
+    }
+
+    await axios.post('https://ethpay.onrender.com/auth/signin', loginData)
+      .then(async (response) => {
+        await SecureStore.setItemAsync('accessToken', response.data.accessToken);
+        setLoading(false);
+        navigation.navigate('Home');
+      })
+      .catch(error => {
+        console.log(error)
+        setLoading(false);
+        setErrorMessage(error.response.data)
+      });
+  }
 
   return (
     <ImageBackground
@@ -51,10 +87,13 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           </View>
           <TouchableOpacity
             style={styles.loginButton}
-            onPress={() => navigation.navigate('Home')}
+            onPress={handleLogin}
           >
-            <Text style={styles.loginButtonText}>Login</Text>
+            {loading ? <ActivityIndicator style={{height: 25}}/> : 
+              <Text style={styles.loginButtonText}>Login</Text>
+            }
           </TouchableOpacity>
+          <Text style={styles.errorMessageText}>{errorMessage}</Text>
           <TouchableOpacity>
             <Text style={styles.forgotPassword}>Forgot your password?</Text>
           </TouchableOpacity>
@@ -144,6 +183,11 @@ const styles = StyleSheet.create({
     color: '#4169E1',
     textAlign: 'center',
     marginTop: 10,
+  },
+  errorMessageText: {
+    color: 'red',
+    alignSelf: 'center',
+    marginTop: 15,
   },
 });
 

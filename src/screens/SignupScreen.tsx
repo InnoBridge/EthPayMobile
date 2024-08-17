@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, TextInput, ImageBackground, Image } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View, TouchableOpacity, TextInput, ImageBackground, Image } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../Navigation';
 import { Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
 
 type SignupScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Signup'>;
 
@@ -12,10 +13,56 @@ type Props = {
 
 const SignupScreen: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [loading, setLoading] = useState(false)
 
+  const handleSignUp = async () => {
+
+    if (!email) {
+      setErrorMessage('Please enter your email');
+      return;
+    }
+    if (!username) {
+      setErrorMessage('Please enter a username');
+      return;
+    }
+    if (!password) {
+      setErrorMessage('Please enter a password');
+      return;
+    }
+    if (!confirmPassword) {
+      setErrorMessage('Please confirm your password');
+      return;
+    }
+    if (password != confirmPassword) {
+      setErrorMessage('Passwords do not match');
+      return;
+    }
+
+    setLoading(true);
+    setErrorMessage('');
+
+    const signUpData = {
+      username: username,
+      email: email,
+      password: password,
+    }
+
+    await axios.post('https://ethpay.onrender.com/auth/signup', signUpData)
+      .then(async (response) => {
+        setLoading(false);
+        navigation.navigate('Login');
+      })
+      .catch(error => {
+        setLoading(false);
+        setErrorMessage(error.response.data)
+      });
+  }
+  
   return (
     <ImageBackground
       source={require('../../assets/background.jpg')}
@@ -36,6 +83,13 @@ const SignupScreen: React.FC<Props> = ({ navigation }) => {
             placeholderTextColor="#A0A0A0"
             value={email}
             onChangeText={setEmail}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Username"
+            placeholderTextColor="#A0A0A0"
+            value={username}
+            onChangeText={setUsername}
           />
           <View style={styles.passwordContainer}>
             <TextInput
@@ -60,10 +114,13 @@ const SignupScreen: React.FC<Props> = ({ navigation }) => {
           />
           <TouchableOpacity
             style={styles.signupButton}
-            onPress={() => navigation.navigate('Home')}
+            onPress={handleSignUp}
           >
-            <Text style={styles.signupButtonText}>Sign Up</Text>
+            {loading ? <ActivityIndicator style={{height: 25}}/> : 
+              <Text style={styles.signupButtonText}>Sign Up</Text>
+            }
           </TouchableOpacity>
+          <Text style={styles.errorMessageText}>{errorMessage}</Text>
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
             <Text style={styles.loginLink}>Already have an account? <Text style={styles.loginLinkText}>Login</Text></Text>
           </TouchableOpacity>
@@ -140,6 +197,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
+    height: 25,
   },
   loginLink: {
     color: '#FFFFFF',
@@ -147,8 +205,13 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   loginLinkText: {
-      color: '#4169E1',
-    },
+    color: '#4169E1',
+  },
+  errorMessageText: {
+    color: 'red',
+    alignSelf: 'center',
+    marginTop: 15,
+  },
 });
 
 export default SignupScreen;

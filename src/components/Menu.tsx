@@ -33,7 +33,7 @@ const Menu: React.FC<MenuProps> = ({ visible, onClose, navigation }) => {
             <Ionicons name="settings-outline" size={24} color="#4B0082" style={styles.iconPadding} />
             <Text style={styles.menuText}>Settings</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem} onPress={() => { navigation.navigate('Logout'); onClose(); }}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => { navigation.navigate('Login'); onClose(); }}>
             <Ionicons name="log-out-outline" size={24} color="#4B0082" style={styles.iconPadding} />
             <Text style={styles.menuText}>Logout</Text>
           </TouchableOpacity>

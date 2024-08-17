@@ -34,6 +34,9 @@
         "projectId": "23cc5a22-e015-4b2f-9b35-8c7648a7808d"
       }
     },
-    "owner": "alofyahweh"
+    "owner": "alofyahweh",
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }
