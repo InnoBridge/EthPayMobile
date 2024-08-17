@@ -8,6 +8,7 @@ import RecentTransactionsScreen from './screens/RecentTransactionsScreen';
 import FriendScreen from './screens/FriendScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import PaymentScreen from './screens/PaymentScreen';
+import AddFriendScreen from './screens/AddFriendScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -29,6 +30,7 @@ const Navigation = () => {
         <Stack.Screen name='Friends' component={FriendScreen} />
         <Stack.Screen name='Profile' component={ProfileScreen} />
         <Stack.Screen name='MakePayment' component={PaymentScreen} />
+        <Stack.Screen name='AddFriend' component={AddFriendScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
