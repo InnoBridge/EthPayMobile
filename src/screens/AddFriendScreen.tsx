@@ -4,7 +4,7 @@ import BottomAppBar from '../components/BottomAppBar';
 import { StyleSheet, Text, View, TouchableOpacity, ImageBackground, TextInput } from 'react-native';
 
 const AddFriendScreen = ({ navigation }) => {
-    const [email, setEmail] = useState('example@gmail.com');
+    const [email, setEmail] = useState('');
     const [isEditingEmail, setIsEditingEmail] = useState(false);
 
     return (

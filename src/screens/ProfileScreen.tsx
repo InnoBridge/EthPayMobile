@@ -21,11 +21,15 @@ const ProfileScreen = ({ navigation }) => {
                 <Text style={styles.subsubheader}>Tap each box to edit information</Text>
                 <Text style={styles.subheader}></Text>
                 <View style={styles.optionsContainer}>
-                    <Text style={styles.optionText}>Email: example@gmail.com</Text>
+                    <Text style={styles.optionText}>User ID:</Text>
                 </View>
                 <Text style={styles.subheader}></Text>
                 <View style={styles.optionsContainer}>
-                    <Text style={styles.optionText}>Password: ********</Text>
+                    <Text style={styles.optionText}>Username:</Text>
+                </View>
+                <Text style={styles.subheader}></Text>
+                <View style={styles.optionsContainer}>
+                    <Text style={styles.optionText}>Email:</Text>
                 </View>
             </View>
             <BottomAppBar navigation={navigation} />
