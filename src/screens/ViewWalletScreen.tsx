@@ -1,9 +1,76 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import BottomAppBar from '../components/BottomAppBar';
-import { StyleSheet, Text, View, TouchableOpacity, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ImageBackground, ScrollView, TextInput } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
+import axios from 'axios';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 const ViewWalletScreen = ({ navigation }) => {
+    const [balances, setBalances] = useState({});
+    const [open, setOpen] = useState(false);
+    const [value, setValue] = useState('USD');
+    const [items, setItems] = useState([
+      {label: 'USD', value: 'USD'},
+      {label: 'EUR', value: 'EUR'},
+      {label: 'GBP', value: 'GBP'},
+      {label: 'JPY', value: 'JPY'},
+      {label: 'AUD', value: 'AUD'},
+      {label: 'CAD', value: 'CAD'},
+      {label: 'CHF', value: 'CHF'},
+      {label: 'CNY', value: 'CNY'},
+      {label: 'SEK', value: 'SEK'},
+      {label: 'NZD', value: 'NZD'},
+    ]);
+    const [open2, setOpen2] = useState(false);
+    const [value2, setValue2] = useState('USD');
+    const [items2, setItems2] = useState([
+      {label: 'USD', value: 'USD'},
+      {label: 'EUR', value: 'EUR'},
+      {label: 'GBP', value: 'GBP'},
+      {label: 'JPY', value: 'JPY'},
+      {label: 'AUD', value: 'AUD'},
+      {label: 'CAD', value: 'CAD'},
+      {label: 'CHF', value: 'CHF'},
+      {label: 'CNY', value: 'CNY'},
+      {label: 'SEK', value: 'SEK'},
+      {label: 'NZD', value: 'NZD'},
+    ]);
+
+    useEffect(() => {
+      (async () => {
+        const token = await SecureStore.getItemAsync('accessToken');
+        await axios.get('https://ethpay.onrender.com/account', {
+          headers: {
+            'accept': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        })
+        .then(response => {
+          setBalances(response.data.balances);
+        })
+        .catch(async (error) => {
+          console.log(error.response.data)
+          await axios.post('https://ethpay.onrender.com/account/create', {}, {
+            headers: {
+              'accept': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          })
+          .then(response => {
+            setBalances(response.data.balances);
+          })
+          .catch(error => {
+            console.error('Error:', error.response.data);
+          });
+        });
+      })();
+    }, []);
+
+    const handleDeposit = () => {
+      
+    }
+
     return (
         <ImageBackground
             source={require('../../assets/background.jpg')}
@@ -18,11 +85,51 @@ const ViewWalletScreen = ({ navigation }) => {
                     <View style={styles.placeholder} />
                 </View>
                 <Text style={styles.subheader}>Balance</Text>
-                <Text style={styles.subsubheader}>Check your balance here</Text>
-                <Text style={styles.subheader}></Text>
-                <View style={styles.optionsContainer}>
-                    <Text style={styles.optionText}>Wallet Balance: $30 (USD)</Text>
+                <Text style={styles.subsubheader}>Deposit</Text>
+                <View style={{flexDirection: 'row', marginBottom: 10}}>
+                  <TextInput style={styles.input}/>
+                  <DropDownPicker
+                    open={open}
+                    value={value}
+                    items={items}
+                    setOpen={setOpen}
+                    setValue={setValue}
+                    setItems={setItems}
+                    style={styles.currencySelector}
+                    dropDownContainerStyle={{width: '25%'}}
+                    zIndex={2}
+                  />
+                  <TouchableOpacity style={styles.submitButton}>
+                    <Text style={styles.submitText}>Deposit</Text>
+                  </TouchableOpacity>
                 </View>
+                <Text style={styles.subsubheader}>Withdraw</Text>
+                <View style={{flexDirection: 'row', marginBottom: 20}}>
+                  <TextInput style={styles.input}/>
+                  <DropDownPicker
+                    open={open2}
+                    value={value2}
+                    items={items2}
+                    setOpen={setOpen2}
+                    setValue={setValue2}
+                    setItems={setItems2}
+                    style={styles.currencySelector}
+                    dropDownContainerStyle={{width: '25%'}}
+                    zIndex={1}
+                  />
+                  <TouchableOpacity style={styles.submitButton}>
+                    <Text style={styles.submitText}>Withdraw</Text>
+                  </TouchableOpacity>
+                </View>
+                <ScrollView>
+                  {Object.keys(balances).map((key) => (
+                    <View key={key} style={styles.optionsContainer}>
+                      <Text style={styles.optionText}>{key}</Text>
+                      <Text>Balance: ${balances[key].balance}</Text>
+                      <Text>Available: ${balances[key].availableFund}</Text>
+                    </View>
+                  ))}
+                </ScrollView>
             </View>
             <BottomAppBar navigation={navigation} />
         </ImageBackground>
@@ -61,16 +168,41 @@ const styles = StyleSheet.create({
     subsubheader: {
         fontSize: 18,
         color: '#FFFFFF',
-        marginBottom: 30,
+        marginBottom: 10,
     },
     optionsContainer: {
         backgroundColor: '#FFFFFF',
         borderRadius: 10,
         padding: 20,
+        marginBottom: 10,
     },
     optionText: {
         fontSize: 16,
         color: '#4B0082',
+    },
+    submitButton: {
+      position: 'absolute',
+      right: 0,
+      backgroundColor: '#47d613',
+      height: '100%',
+      width: '25%',
+      borderRadius: 5,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    input: {
+      backgroundColor: 'white',
+      width: '45%',
+      padding: 10,
+      borderRadius: 10,
+      marginRight: '2%',
+    },
+    currencySelector: {
+      width: '25%',
+    },
+    submitText: {
+      color: 'white',
+      fontWeight: 'bold',
     },
 });
 
