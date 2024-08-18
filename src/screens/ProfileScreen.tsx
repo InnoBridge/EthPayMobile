@@ -1,9 +1,37 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import BottomAppBar from '../components/BottomAppBar';
 import { StyleSheet, Text, View, TouchableOpacity, ImageBackground } from 'react-native';
+import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';
 
 const ProfileScreen = ({ navigation }) => {
+    const [userId, setUserID] = useState('');
+    const [userName, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+
+    useEffect(() => {
+        (async () => {
+            const token = await SecureStore.getItemAsync('accessToken');
+            await axios.get('https://ethpay.onrender.com/profile', {
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+                })
+                .then(response => {
+                    const {userId, userName, email} = response.data;
+                    setUserID(userId);
+                    setUsername(userName);
+                    setEmail(email);
+                    console.log(response.data)
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        })()},[])
+            
+
     return (
         <ImageBackground
             source={require('../../assets/background.jpg')}
@@ -19,17 +47,14 @@ const ProfileScreen = ({ navigation }) => {
                 </View>
                 <Text style={styles.subheader}>Security</Text>
                 <Text style={styles.subsubheader}>Tap each box to edit information</Text>
-                <Text style={styles.subheader}></Text>
                 <View style={styles.optionsContainer}>
-                    <Text style={styles.optionText}>User ID:</Text>
+                    <Text style={styles.optionText}>User ID: {userId}</Text>
                 </View>
-                <Text style={styles.subheader}></Text>
                 <View style={styles.optionsContainer}>
-                    <Text style={styles.optionText}>Username:</Text>
+                    <Text style={styles.optionText}>Username: {userName}</Text>
                 </View>
-                <Text style={styles.subheader}></Text>
                 <View style={styles.optionsContainer}>
-                    <Text style={styles.optionText}>Email:</Text>
+                    <Text style={styles.optionText}>Email: {email}</Text>
                 </View>
             </View>
             <BottomAppBar navigation={navigation} />
@@ -75,6 +100,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         borderRadius: 10,
         padding: 20,
+        marginBottom: 10,
     },
     optionText: {
         fontSize: 16,

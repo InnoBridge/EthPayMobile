@@ -14,7 +14,6 @@ const HomeScreen = ({ navigation }) => {
     >
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.email}>example@gmail.com</Text>
           <TouchableOpacity onPress={() => setMenuVisible(true)}>
             <Ionicons name="menu" size={24} color="#FFFFFF" style={styles.menuPadding} />
           </TouchableOpacity>
