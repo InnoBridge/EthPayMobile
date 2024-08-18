@@ -239,6 +239,7 @@ const styles = StyleSheet.create({
       borderRadius: 5,
       justifyContent: 'center',
       alignItems: 'center',
+      zIndex: 100,
     },
     input: {
       backgroundColor: 'white',
