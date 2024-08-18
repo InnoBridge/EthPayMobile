@@ -36,6 +36,8 @@ const ViewWalletScreen = ({ navigation }) => {
       {label: 'SEK', value: 'SEK'},
       {label: 'NZD', value: 'NZD'},
     ]);
+    const [depositValue, setDepositValue] = useState('');
+    const [withdrawValue, setWithdrawValue] = useState('');
 
     useEffect(() => {
       (async () => {
@@ -67,8 +69,56 @@ const ViewWalletScreen = ({ navigation }) => {
       })();
     }, []);
 
-    const handleDeposit = () => {
-      
+    const handleDeposit = async () => {
+      const amount = Number(depositValue);
+      const token = await SecureStore.getItemAsync('accessToken');
+      await axios.post(
+        'https://ethpay.onrender.com/account/deposit', 
+        null,
+        {
+          params: {
+            currency: value,
+            amount: amount
+          },
+          headers: {
+            'accept': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      )
+      .then(response => {
+        setBalances(response.data.balances);
+        setDepositValue('');
+      })
+      .catch(error => {
+        console.error('Error:', error.response.data);
+      });
+    }
+
+    const handleWithdraw = async () => {
+      const amount = Number(withdrawValue);
+      const token = await SecureStore.getItemAsync('accessToken');
+      await axios.post(
+        'https://ethpay.onrender.com/account/withdraw', 
+        null,
+        {
+          params: {
+            currency: value2,
+            amount: amount
+          },
+          headers: {
+            'accept': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      )
+      .then(response => {
+        setBalances(response.data.balances);
+        setWithdrawValue('');
+      })
+      .catch(error => {
+        console.error('Error:', error.response.data);
+      });
     }
 
     return (
@@ -87,7 +137,7 @@ const ViewWalletScreen = ({ navigation }) => {
                 <Text style={styles.subheader}>Balance</Text>
                 <Text style={styles.subsubheader}>Deposit</Text>
                 <View style={{flexDirection: 'row', marginBottom: 10}}>
-                  <TextInput style={styles.input}/>
+                  <TextInput style={styles.input} value={depositValue} onChangeText={setDepositValue}/>
                   <DropDownPicker
                     open={open}
                     value={value}
@@ -99,13 +149,13 @@ const ViewWalletScreen = ({ navigation }) => {
                     dropDownContainerStyle={{width: '25%'}}
                     zIndex={2}
                   />
-                  <TouchableOpacity style={styles.submitButton}>
+                  <TouchableOpacity style={styles.submitButton} onPress={handleDeposit}>
                     <Text style={styles.submitText}>Deposit</Text>
                   </TouchableOpacity>
                 </View>
                 <Text style={styles.subsubheader}>Withdraw</Text>
                 <View style={{flexDirection: 'row', marginBottom: 20}}>
-                  <TextInput style={styles.input}/>
+                  <TextInput style={styles.input} value={withdrawValue} onChangeText={setWithdrawValue}/>
                   <DropDownPicker
                     open={open2}
                     value={value2}
@@ -117,7 +167,7 @@ const ViewWalletScreen = ({ navigation }) => {
                     dropDownContainerStyle={{width: '25%'}}
                     zIndex={1}
                   />
-                  <TouchableOpacity style={styles.submitButton}>
+                  <TouchableOpacity style={styles.submitButton} onPress={handleWithdraw}>
                     <Text style={styles.submitText}>Withdraw</Text>
                   </TouchableOpacity>
                 </View>
