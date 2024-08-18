@@ -3,10 +3,10 @@ import { Ionicons } from '@expo/vector-icons';
 import BottomAppBar from '../components/BottomAppBar';
 import { StyleSheet, Text, View, TouchableOpacity, ImageBackground, TextInput } from 'react-native';
 
-const ProfileScreen = ({ navigation }) => {
-    const [email, setEmail] = useState('example@gmail.com');
-    const [confirmEmail, setConfirmEmail] = useState('example@gmail.com');
-    const [amount, setAmount] = useState('315');
+const PaymentScreen = ({ navigation }) => {
+    const [email, setEmail] = useState('');
+    const [confirmEmail, setConfirmEmail] = useState('');
+    const [amount, setAmount] = useState('0');
     const [isEditingEmail, setIsEditingEmail] = useState(false);
     const [isEditingConfirmEmail, setIsEditingConfirmEmail] = useState(false);
     const [isEditingAmount, setIsEditingAmount] = useState(false);
@@ -147,4 +147,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default ProfileScreen;
+export default PaymentScreen;
