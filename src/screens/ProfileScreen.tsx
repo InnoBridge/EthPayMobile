@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     },
     optionText: {
         fontSize: 16,
-        color: '#4B0082',
+        color: '#000000',
     },
 });
 

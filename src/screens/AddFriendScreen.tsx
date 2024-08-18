@@ -89,11 +89,11 @@ const styles = StyleSheet.create({
     },
     optionText: {
         fontSize: 16,
-        color: '#4B0082',
+        color: '#000000',
     },
     optionTextInput: {
         fontSize: 16,
-        color: '#4B0082',
+        color: '#000000',
         borderBottomWidth: 1,
         borderBottomColor: '#4B0082',
     },

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import BottomAppBar from '../components/BottomAppBar';
 import { StyleSheet, Text, View, TouchableOpacity, ImageBackground, TextInput } from 'react-native';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 const PaymentScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
@@ -10,6 +11,20 @@ const PaymentScreen = ({ navigation }) => {
     const [isEditingEmail, setIsEditingEmail] = useState(false);
     const [isEditingConfirmEmail, setIsEditingConfirmEmail] = useState(false);
     const [isEditingAmount, setIsEditingAmount] = useState(false);
+    const [open2, setOpen2] = useState(false);
+    const [value2, setValue2] = useState('USD');
+    const [items2, setItems2] = useState([
+      {label: 'USD', value: 'USD'},
+      {label: 'EUR', value: 'EUR'},
+      {label: 'GBP', value: 'GBP'},
+      {label: 'JPY', value: 'JPY'},
+      {label: 'AUD', value: 'AUD'},
+      {label: 'CAD', value: 'CAD'},
+      {label: 'CHF', value: 'CHF'},
+      {label: 'CNY', value: 'CNY'},
+      {label: 'SEK', value: 'SEK'},
+      {label: 'NZD', value: 'NZD'},
+    ]);
 
     return (
         <ImageBackground
@@ -58,22 +73,35 @@ const PaymentScreen = ({ navigation }) => {
                         <Text style={styles.optionText}>Confirm Email: {confirmEmail}</Text>
                     )}
                 </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.optionsContainer}
-                    onPress={() => setIsEditingAmount(!isEditingAmount)}
-                >
-                    {isEditingAmount ? (
-                        <TextInput
-                            style={styles.optionTextInput}
-                            value={amount}
-                            onChangeText={setAmount}
-                            autoFocus={true}
-                            keyboardType="numeric"
-                        />
-                    ) : (
-                        <Text style={styles.optionText}>Amount: ${amount} (USD)</Text>
-                    )}
-                </TouchableOpacity>
+                <View style={styles.containerBox}>
+                    <TouchableOpacity
+                        style={styles.amountContainer}
+                        onPress={() => setIsEditingAmount(!isEditingAmount)}
+                    >
+                        {isEditingAmount ? (
+                            <TextInput
+                                style={styles.optionTextInput}
+                                value={amount}
+                                onChangeText={setAmount}
+                                autoFocus={true}
+                                keyboardType="numeric"
+                            />
+                        ) : (
+                            <Text style={styles.optionText}>Amount: ${amount}</Text>
+                        )}
+                    </TouchableOpacity>
+                    <DropDownPicker
+                        open={open2}
+                        value={value2}
+                        items={items2}
+                        setOpen={setOpen2}
+                        setValue={setValue2}
+                        setItems={setItems2}
+                        style={styles.currencySelector}
+                        dropDownContainerStyle={{width: '30%'}}
+                        zIndex={5}
+                    />
+                </View>
                 <TouchableOpacity style={styles.sendButton} onPress={print()}>
                     <Text style={styles.sendButtonText}>Send</Text>
                 </TouchableOpacity>
@@ -123,13 +151,20 @@ const styles = StyleSheet.create({
         padding: 20,
         marginBottom: 10,
     },
+    amountContainer: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 10,
+        padding: 20,
+        marginBottom: 10,
+        width: '70%',
+    },
     optionText: {
         fontSize: 16,
-        color: '#4B0082',
+        color: '#000000',
     },
     optionTextInput: {
         fontSize: 16,
-        color: '#4B0082',
+        color: '#000000',
         borderBottomWidth: 1,
         borderBottomColor: '#4B0082',
     },
@@ -138,12 +173,26 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         padding: 15,
         alignItems: 'center',
-        marginTop: 20,
+        marginTop: 10,
     },
     sendButtonText: {
         fontSize: 18,
         color: '#FFFFFF',
         fontWeight: 'bold',
+    },
+    currencySelector: {
+        width: '30%',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 10,
+        marginBottom: 8,
+        padding: 20,
+        flex: 1,
+    },
+    containerBox: { // container for the amount and the dropdown so they are beside each other
+        flexDirection: 'row',
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'space-between',
     },
 });
 
