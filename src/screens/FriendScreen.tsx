@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
@@ -80,9 +80,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    paddingVertical: 16,
+    borderBottomWidth: 2,
+    borderBottomColor: '#777777',
+    paddingHorizontal: 4,
   },
   friendsText: {
     fontSize: 16,
