@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import BottomAppBar from '../components/BottomAppBar';
-import { StyleSheet, Text, View, TouchableOpacity, ImageBackground, TextInput } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View, TouchableOpacity, ImageBackground, TextInput } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
+import * as SecureStore from 'expo-secure-store';
+import axios from 'axios';
 
 const PaymentScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
@@ -25,6 +27,59 @@ const PaymentScreen = ({ navigation }) => {
       {label: 'SEK', value: 'SEK'},
       {label: 'NZD', value: 'NZD'},
     ]);
+    const [sending, setSending] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+
+    const handleSendMoney = async () => {
+      if (!email) {
+        setErrorMessage('Please enter an email');
+        return;
+      }
+      if (!confirmEmail) {
+        setErrorMessage('Please confirm the email');
+        return;
+      }
+      if (!amount) {
+        setErrorMessage('Amount cannot be zero');
+        return;
+      }
+      if (email != confirmEmail) {
+        setErrorMessage('Emails do not match');
+        return;
+      }
+      setSending(true);
+      const token = await SecureStore.getItemAsync('accessToken');
+        await axios.post('https://ethpay.onrender.com/transaction/create',
+          null,
+          {
+            params: {
+              receiverEmail: email,
+              sourceCurrency: value2,
+              targetCurrency: value2,
+              targetAmount: amount
+            },
+            headers: {
+              'accept': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          }
+        )
+        .then(response => {
+          console.log(response.data);
+          setSending(false);
+          setEmail('');
+          setConfirmEmail('');
+          setAmount('0');
+          setErrorMessage('');
+          setIsEditingEmail(false);
+          setIsEditingConfirmEmail(false);
+          setIsEditingAmount(false);
+        })
+        .catch(error => {
+          setErrorMessage(error.response.data)
+          setSending(false);
+        });
+    }
 
     return (
         <ImageBackground
@@ -102,9 +157,12 @@ const PaymentScreen = ({ navigation }) => {
                         zIndex={5}
                     />
                 </View>
-                <TouchableOpacity style={styles.sendButton} onPress={print()}>
+                <TouchableOpacity style={styles.sendButton} onPress={handleSendMoney}>
+                  {sending ? <ActivityIndicator style={{height: 25}}/> : 
                     <Text style={styles.sendButtonText}>Send</Text>
+                  }
                 </TouchableOpacity>
+                <Text style={styles.errorMessageText}>{errorMessage}</Text>
             </View>
             <BottomAppBar navigation={navigation} />
         </ImageBackground>
@@ -193,6 +251,11 @@ const styles = StyleSheet.create({
         width: '100%',
         alignItems: 'center',
         justifyContent: 'space-between',
+    },
+    errorMessageText: {
+      color: 'red',
+      alignSelf: 'center',
+      marginTop: 15,
     },
 });
 
