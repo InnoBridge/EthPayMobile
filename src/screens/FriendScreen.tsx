@@ -1,7 +1,9 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, ImageBackground } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import BottomAppBar from '../components/BottomAppBar';
+import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';
 
 const Friend = ({ item }) => (
   <View style={styles.friendsItem}>
@@ -13,13 +15,24 @@ const Friend = ({ item }) => (
 );
 
 const FriendScreen = ({ navigation }) => {
-  const friends = [
-    { id: '1', name: 'John Doe', email: 'example@gmail.com' },
-    { id: '2', name: 'John Dee', email: 'example@gmail.com' },
-    { id: '3', name: 'John Doo', email: 'example@gmail.com' },
-    { id: '4', name: 'Jane Doe', email: 'example@gmail.com' },
-    { id: '5', name: 'Jane Dee', email: 'example@gmail.com' },
-  ];
+  const [friends, setFriends] = useState([])
+  useEffect(() => {
+    (async () => {
+      const token = await SecureStore.getItemAsync('accessToken');
+      await axios.get('https://ethpay.onrender.com/contacts', {
+        headers: {
+          'accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(response => {
+        setFriends(response.data.contacts);
+      })
+      .catch(async (error) => {
+        console.error('Error: ', error.response.data)
+      });
+    })();
+  }, []);
 
   return (
     <ImageBackground
@@ -30,6 +43,9 @@ const FriendScreen = ({ navigation }) => {
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('AddFriend')}>
+            <Ionicons icon="plus-round" size={24} color="#FFFFFF" />
           </TouchableOpacity>
           <Text style={styles.title}>Contacts</Text>
           <View style={styles.placeholder} />
