@@ -6,13 +6,34 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
 const Friend = ({ item }) => (
-  <View style={styles.friendsItem}>
-    <View>
-      <Text style={styles.friendsText}>{item.name}</Text>
-      <Text style={styles.friendsEmail}>{item.email}</Text>
+  <View style={{flexDirection: 'column'}}>
+    <View style={styles.friendsItem}>
+      <View>
+        <Text style={styles.friendsText}>{item.name}</Text>
+        <Text style={styles.friendsEmail}>{item.email}</Text>
+      </View>
     </View>
+    <TouchableOpacity onPress={() => removeFriend(item.email)}>
+      <Ionicons icon="close-round" size={24} color="#FFFFFF" />
+    </TouchableOpacity>
   </View>
 );
+
+const removeFriend = async (friend: string) => {
+  const token = await SecureStore.getItemAsync('accessToken');
+  await axios.delete('https://ethpay.onrender.com/contacts',
+    null,
+    {
+      params: {
+        email: friend
+      },
+      headers: {
+        'accept': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    }
+  )
+}
 
 const FriendScreen = ({ navigation }) => {
   const [friends, setFriends] = useState([])
@@ -93,6 +114,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   friendsItem: {
+    flex: 9,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -109,6 +131,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#777777',
   },
+  friendsRemove: {
+    flex: 1,
+  }
 });
 
 export default FriendScreen;

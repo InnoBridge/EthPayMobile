@@ -1,11 +1,45 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import BottomAppBar from '../components/BottomAppBar';
-import { StyleSheet, Text, View, TouchableOpacity, ImageBackground, TextInput } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View, TouchableOpacity, ImageBackground, TextInput } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
+import axios from 'axios';
 
 const AddFriendScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [isEditingEmail, setIsEditingEmail] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [sending, setSending] = useState(false);
+    const addFriend = async () => {
+        if (!email) {
+            setErrorMessage('Please enter an email');
+            return;
+        }
+        const token = await SecureStore.getItemAsync('accessToken');
+        await axios.post('https://ethpay.onrender.com/contacts',
+          null,
+          {
+            params: {
+              email: email
+            },
+            headers: {
+              'accept': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          }
+        )
+        .then(response => {
+          console.log(response.data);
+          setSending(false);
+          setEmail('');
+          setErrorMessage('');
+          setIsEditingEmail(false);
+        })
+        .catch(error => {
+          setErrorMessage(error.response.data)
+          setSending(false);
+        });
+    }
 
     return (
         <ImageBackground
@@ -38,9 +72,12 @@ const AddFriendScreen = ({ navigation }) => {
                         <Text style={styles.optionText}>Email: {email}</Text>
                     )}
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.sendButton} onPress={print()}>
-                    <Text style={styles.sendButtonText}>Add Friend</Text>
+                <TouchableOpacity style={styles.sendButton} onPress={addFriend}>
+                    {sending ? <ActivityIndicator style={{height: 25}}/> : 
+                        <Text style={styles.sendButtonText}>Add Friend</Text>
+                    }
                 </TouchableOpacity>
+                <Text style={styles.errorMessageText}>{errorMessage}</Text>
             </View>
             <BottomAppBar navigation={navigation} />
         </ImageBackground>
@@ -109,6 +146,11 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         fontWeight: 'bold',
     },
+    errorMessageText: {
+        color: 'red',
+        alignSelf: 'center',
+        marginTop: 15,
+      },
 });
 
 export default AddFriendScreen;
