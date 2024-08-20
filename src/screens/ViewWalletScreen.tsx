@@ -175,8 +175,8 @@ const ViewWalletScreen = ({ navigation }) => {
                   {Object.keys(balances).map((key) => (
                     <View key={key} style={styles.optionsContainer}>
                       <Text style={styles.optionText}>{key}</Text>
-                      <Text>Balance: ${balances[key].balance}</Text>
-                      <Text>Available: ${balances[key].availableFund}</Text>
+                      <Text>Balance: ${balances[key].balance.toFixed(2)}</Text>
+                      <Text>Available: ${balances[key].availableFund.toFixed(2)}</Text>
                     </View>
                   ))}
                 </ScrollView>

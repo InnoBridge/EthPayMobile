@@ -1,28 +1,69 @@
-import React from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, ImageBackground } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, ImageBackground, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import BottomAppBar from '../components/BottomAppBar';
+import * as SecureStore from 'expo-secure-store';
+import axios from 'axios';
 
-const TransactionItem = ({ item }) => (
-  <View style={styles.transactionItem}>
-    <View>
-      <Text style={styles.transactionText}>{item.type}: {item.email}</Text>
-      <Text style={styles.transactionDate}>{item.date}</Text>
+const TransactionItem = ({ item, email }) => {
+  const rawDate = new Date(item.completedDate);
+  const date = rawDate.toLocaleDateString('en-US', {
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric'
+  }) + ' ' + rawDate.toLocaleTimeString('en-US');
+  const type = email === item.senderEmail ? 'TO' : 'FROM';
+  const otherEmail = email === item.senderEmail ? item.receiverEmail : item.senderEmail;
+
+  return (
+    <View style={styles.transactionItem}>
+      <View>
+        <Text style={styles.transactionText}>{type}: {otherEmail}</Text>
+        <Text style={styles.transactionDate}>{date}</Text>
+      </View>
+      <Text style={[type === 'FROM' ? styles.positiveAmount : styles.negativeAmount]}>
+        {type === 'TO' ? 
+          <Text>${item.sourceAmount.toFixed(2)} {item.sourceCurrency}</Text> :
+          <Text>${item.targetAmount.toFixed(2)} {item.targetCurrency}</Text>}
+      </Text>
     </View>
-    <Text style={[styles.transactionAmount, item.amount > 0 ? styles.positiveAmount : styles.negativeAmount]}>
-      {item.amount > 0 ? '+' : ''}{item.amount.toFixed(2)}
-    </Text>
-  </View>
-);
+  );
+};
 
 const RecentTransactionsScreen = ({ navigation }) => {
-  const transactions = [
-    { id: '1', type: 'FROM', email: 'example@gmail.com', date: 'March 27, 2024', amount: 25.00 },
-    { id: '2', type: 'TO', email: 'example@gmail.com', date: 'March 14, 2024', amount: -15.00 },
-    { id: '3', type: 'TO', email: 'example@gmail.com', date: 'February 7, 2024', amount: -180.00 },
-    { id: '4', type: 'FROM', email: 'example@gmail.com', date: 'December 27, 2023', amount: 1234.56 },
-    { id: '5', type: 'FROM', email: 'example@gmail.com', date: 'July 13, 2023', amount: 4.50 },
-  ];
+  const [transactions, setTransactions] = useState([]);
+  const [email, setEmail] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      const token = await SecureStore.getItemAsync('accessToken');
+      await axios.get('https://ethpay.onrender.com/profile', {
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+        })
+        .then(response => {
+            setEmail(response.data.email);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+      await axios.get('https://ethpay.onrender.com/transaction', {
+        headers: {
+          'accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(response => {
+        setTransactions(response.data);
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    })();
+  }, []);
 
   return (
     <ImageBackground
@@ -37,13 +78,11 @@ const RecentTransactionsScreen = ({ navigation }) => {
           <Text style={styles.title}>Transactions</Text>
           <View style={styles.placeholder} />
         </View>
-        <View style={styles.transactionsContainer}>
-          <FlatList
-            data={transactions}
-            renderItem={({ item }) => <TransactionItem item={item} />}
-            keyExtractor={item => item.id}
-          />
-        </View>
+        <ScrollView style={styles.transactionsContainer}>
+          {transactions.map((item) => (
+            <TransactionItem item={item} email={email}/>
+          ))}
+        </ScrollView>
       </View>
       <BottomAppBar navigation={navigation} />
     </ImageBackground>
