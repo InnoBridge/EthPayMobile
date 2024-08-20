@@ -13,6 +13,20 @@ const PaymentScreen = ({ navigation }) => {
     const [isEditingEmail, setIsEditingEmail] = useState(false);
     const [isEditingConfirmEmail, setIsEditingConfirmEmail] = useState(false);
     const [isEditingAmount, setIsEditingAmount] = useState(false);
+    const [open, setOpen] = useState(false);
+    const [value, setValue] = useState('USD');
+    const [items, setItems] = useState([
+      {label: 'USD', value: 'USD'},
+      {label: 'EUR', value: 'EUR'},
+      {label: 'GBP', value: 'GBP'},
+      {label: 'JPY', value: 'JPY'},
+      {label: 'AUD', value: 'AUD'},
+      {label: 'CAD', value: 'CAD'},
+      {label: 'CHF', value: 'CHF'},
+      {label: 'CNY', value: 'CNY'},
+      {label: 'SEK', value: 'SEK'},
+      {label: 'NZD', value: 'NZD'},
+    ]);
     const [open2, setOpen2] = useState(false);
     const [value2, setValue2] = useState('USD');
     const [items2, setItems2] = useState([
@@ -26,6 +40,15 @@ const PaymentScreen = ({ navigation }) => {
       {label: 'CNY', value: 'CNY'},
       {label: 'SEK', value: 'SEK'},
       {label: 'NZD', value: 'NZD'},
+    ]);
+    const [open3, setOpen3] = useState(false);
+    const [value3, setValue3] = useState('BITCOIN');
+    const [items3, setItems3] = useState([
+      {label: 'BITCOIN', value: 'BITCOIN'},
+      {label: 'ETHEREUM', value: 'ETHEREUM'},
+      {label: 'LITECOIN', value: 'LITECOIN'},
+      {label: 'RIPPLE', value: 'RIPPLE'},
+      {label: 'DOGECOIN', value: 'DOGECOIN'},
     ]);
     const [sending, setSending] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
@@ -54,9 +77,10 @@ const PaymentScreen = ({ navigation }) => {
           {
             params: {
               receiverEmail: email,
-              sourceCurrency: value2,
+              sourceCurrency: value,
               targetCurrency: value2,
-              targetAmount: amount
+              targetAmount: amount,
+              substrateCrypto: value3,
             },
             headers: {
               'accept': 'application/json',
@@ -65,7 +89,6 @@ const PaymentScreen = ({ navigation }) => {
           }
         )
         .then(response => {
-          console.log(response.data);
           setSending(false);
           setEmail('');
           setConfirmEmail('');
@@ -154,7 +177,43 @@ const PaymentScreen = ({ navigation }) => {
                         setItems={setItems2}
                         style={styles.currencySelector}
                         dropDownContainerStyle={{width: '30%'}}
-                        zIndex={5}
+                        zIndex={3}
+                    />
+                </View>
+                <View style={{flexDirection: 'row', marginBottom: 8}}>
+                    <View style={styles.textBox}>
+                        <Text style={styles.optionText}>
+                            From:
+                        </Text>
+                    </View>
+                    <DropDownPicker
+                        open={open}
+                        value={value}
+                        items={items}
+                        setOpen={setOpen}
+                        setValue={setValue}
+                        setItems={setItems}
+                        style={styles.currencySelector}
+                        dropDownContainerStyle={{width: '30%'}}
+                        zIndex={2}
+                    />
+                </View>
+                <View style={{flexDirection: 'row'}}>
+                    <View style={{...styles.textBox, width: '55%'}}>
+                        <Text style={styles.optionText}>
+                            Intermediary Crypto:
+                        </Text>
+                    </View>
+                    <DropDownPicker
+                        open={open3}
+                        value={value3}
+                        items={items3}
+                        setOpen={setOpen3}
+                        setValue={setValue3}
+                        setItems={setItems3}
+                        style={{...styles.currencySelector, width: '42%'}}
+                        dropDownContainerStyle={{width: '42%'}}
+                        zIndex={1}
                     />
                 </View>
                 <TouchableOpacity style={styles.sendButton} onPress={handleSendMoney}>
@@ -256,6 +315,15 @@ const styles = StyleSheet.create({
       color: 'red',
       alignSelf: 'center',
       marginTop: 15,
+    },
+    textBox: {
+        backgroundColor: 'white',
+        height: 50,
+        justifyContent: 'center',
+        paddingHorizontal: 20,
+        borderRadius: 10,
+        width: '25%',
+        marginRight: '3%'
     },
 });
 
