@@ -1,38 +1,36 @@
 import React, {useEffect, useState} from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ImageBackground } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import BottomAppBar from '../components/BottomAppBar';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
-const Friend = ({ item }) => (
-  <View style={{flexDirection: 'column'}}>
-    <View style={styles.friendsItem}>
-      <View>
-        <Text style={styles.friendsText}>{item.name}</Text>
-        <Text style={styles.friendsEmail}>{item.email}</Text>
-      </View>
-    </View>
-    <TouchableOpacity onPress={() => removeFriend(item.email)}>
-      <Ionicons icon="close-round" size={24} color="#FFFFFF" />
-    </TouchableOpacity>
+const Friend = ({ item, setFriends }) => (
+  <View style={styles.friendsItem}>
+    <Text>Email: {item}</Text>
+      <TouchableOpacity onPress={async () => await removeFriend(item, setFriends)}>
+        <Ionicons name="close-circle" size={30} color="red" />
+      </TouchableOpacity>
   </View>
 );
 
-const removeFriend = async (friend: string) => {
+const removeFriend = async (friend: string, setFriends) => {
   const token = await SecureStore.getItemAsync('accessToken');
-  await axios.delete('https://ethpay.onrender.com/contacts',
-    null,
-    {
-      params: {
-        email: friend
-      },
-      headers: {
-        'accept': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
+  await axios.delete(`https://ethpay.onrender.com/contacts`, {
+    params: {
+      email: friend
+    },
+    headers: {
+      'accept': 'application/json',
+      'Authorization': `Bearer ${token}`
     }
-  )
+  })
+  .then(response => {
+    setFriends(response.data.contacts);
+  })
+  .catch(error => {
+    console.error('There was an error!', error);
+  });
 }
 
 const FriendScreen = ({ navigation }) => {
@@ -65,18 +63,16 @@ const FriendScreen = ({ navigation }) => {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('AddFriend')}>
+          {/* <TouchableOpacity onPress={() => navigation.navigate('AddFriend')}>
             <Ionicons icon="plus-round" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <Text style={styles.title}>Contacts</Text>
           <View style={styles.placeholder} />
         </View>
         <View style={styles.friendsContainer}>
-          <FlatList
-            data={friends}
-            renderItem={({ item }) => <Friend item={item} />}
-            keyExtractor={item => item.id}
-          />
+          {friends.map((item) => (
+            <Friend item={item} setFriends={setFriends}/>
+          ))}
         </View>
       </View>
       <BottomAppBar navigation={navigation} />
@@ -114,7 +110,6 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   friendsItem: {
-    flex: 9,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
